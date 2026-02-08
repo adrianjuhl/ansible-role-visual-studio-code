@@ -1,0 +1,35 @@
+---
+# tasks file for adrianjuhl.visual_studio_code
+
+# TBD
+# Is there a need to ensure that the /etc/apt/keyrings directory exists?
+# Should this role be responsible for that?
+
+- name: "Install microsoft signing key"
+  ansible.builtin.get_url:
+    url: "{{ adrian_juhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
+    dest: "/etc/apt/keyrings/"
+    mode: "u=rw,go=r"
+    force: true
+  become: true
+
+- name: "Install Visual Studio Code repo"
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture }}
+      {{ adrianjuhl__visual_studio_code__visual_studio_code_gpgcheck | ternary("", " trusted=true") }}
+      signed-by=/etc/apt/keyrings/microsoft.asc]
+      {{ adrian_juhl__visual_studio_code__visual_studio_code_mirror }}/repos/code stable main
+    filename: "vscode"
+    state: "present"
+  when: not adrianjuhl__visual_studio_code__visual_studio_code_skip_add_repo
+  become: true
+
+- name: "Install Visual Studio Code"
+  ansible.builtin.apt:
+    name: "{{ adrianjuhl__visual_studio_code__visual_studio_code_package }}{{ (adrianjuhl__visual_studio_code__visual_studio_code_version | length > 0) | ternary('=' + adrianjuhl__visual_studio_code__visual_studio_code_version, '') }}"
+    state: "present"
+  become: true
+
+
+

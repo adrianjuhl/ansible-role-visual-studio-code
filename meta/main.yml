@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  role_name: "visual_studio_code"
+  namespace: "adrianjuhl"
+  description: "Configure Visual Studio Code - an open source code editor"
+  license: "MIT"
+  author: "Adrian Juhl"
+  min_ansible_version: 2.1
+  galaxy_tags: []
+dependencies: []

@@ -1,0 +1,11 @@
+---
+# From ansible-galaxy (a release tag)
+#- src: "adrianjuhl.visual_studio_code"
+#  version: "0.1.0"
+#  name: "adrianjuhl.visual_studio_code"
+
+# From a branch from the github repo
+- src: "https://github.com/adrianjuhl/ansible-role-visual-studio-code"
+  scm: "git"
+  version: "0.1.0-develop-WIP-1"
+  name: "adrianjuhl.visual_studio_code"

@@ -1,0 +1,7 @@
+---
+- name: "Configure Visual Studio Code"
+  hosts: "localhost"
+  tasks:
+    - name: "Configure Visual Studio Code"
+      ansible.builtin.include_role:
+        name: "adrianjuhl.visual_studio_code"

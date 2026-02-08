@@ -1,0 +1,49 @@
+---
+# defaults file for adrianjuhl.visual_studio_code
+
+# Mirror server for fetching the public keys and the Visual Studio Code
+# installation package. The URL may include directories. The URL must not end
+# with a trailing slash.
+adrianjuhl__visual_studio_code__visual_studio_code_mirror: "https://packages.microsoft.com"
+
+
+
+
+# Ansible architecture to deb architecture mapping
+adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture_mapping:
+  armv6l: "armhf"
+  armv7l: "armhf"
+  aarch64: "arm64"
+
+# The architecture of the deb to install
+adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture: "{{ adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture_mapping[ansible_architecture | lower] | default('amd64') }}"
+
+
+# should the gpgcheck of the repo enabled?
+# if true
+# - for apt repo the option trusted=yes is NOT added
+# - for dnf/yum the option gpgcheck is set to yes
+# - for zypper the option gpgcheck is set to 1
+# true is the default
+# if false
+# - for apt repo the option trusted=yes is added to repo definition
+# - for dnf/yum the option gpgcheck is set to no
+# - for zypper the option gpgcheck is set to 0
+adrianjuhl__visual_studio_code__visual_studio_code_gpgcheck: true
+
+# skip task to add repo for remote package manager
+# if set to true, the task 'install VS Code repo (apt/yum/dnf/zypper)' will be skipped
+# if set to false, the repo will be added, this is the default
+adrianjuhl__visual_studio_code__visual_studio_code_skip_add_repo: false
+
+# Visual Studio Code version number (defaults to the latest version)
+adrianjuhl__visual_studio_code__visual_studio_code_version: ""
+
+# Build (either 'stable' or 'insiders') https://code.visualstudio.com/insiders/
+# Ubuntu only (code-insiders isn't in Microsoft's RPM repo)
+adrianjuhl__visual_studio_code__visual_studio_code_build: "stable"
+
+# The package name to install
+adrianjuhl__visual_studio_code__visual_studio_code_package: "{{ (adrianjuhl__visual_studio_code__visual_studio_code_build == 'insiders') | ternary('code-insiders', 'code') }}"
+
+
