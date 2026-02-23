@@ -18,17 +18,27 @@
     cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
     creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
 
+#- name: "Install Visual Studio Code repo"
+#  ansible.builtin.apt_repository:
+#    repo: >-
+#      deb [arch={{ adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture }}
+#      {{ adrianjuhl__visual_studio_code__visual_studio_code_gpgcheck | ternary("", " trusted=true") }}
+#      signed-by=/usr/share/keyrings/microsoft.gpg]
+#      {{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/repos/code stable main
+#    filename: "vscode"
+#    state: "present"
+#  when: not adrianjuhl__visual_studio_code__visual_studio_code_skip_add_repo
+#  become: true
+
 - name: "Install Visual Studio Code repo"
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [arch={{ adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture }}
-      {{ adrianjuhl__visual_studio_code__visual_studio_code_gpgcheck | ternary("", " trusted=true") }}
-      signed-by=/usr/share/keyrings/microsoft.gpg]
-      {{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/repos/code stable main
-    filename: "vscode"
-    state: "present"
-  when: not adrianjuhl__visual_studio_code__visual_studio_code_skip_add_repo
-  become: true
+  ansible.builtin.deb822_repository:
+    name: "vscode"
+    types: "deb"
+    uris: "https://packages.microsoft.com/repos/code"
+    suites: "stable"
+    components:
+      - "main"
+    signed_by: "/usr/share/keyrings/microsoft.gpg"
 
 - name: "Install Visual Studio Code"
   ansible.builtin.apt:
