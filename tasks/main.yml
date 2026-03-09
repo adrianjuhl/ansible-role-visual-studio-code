@@ -11,27 +11,17 @@
     dest: "/usr/share/keyrings/"
     mode: "u=rw,go=r"
     force: true
+  when: ansible_facts['os_family'] == "Debian"
   become: true
 
 - name: "Dearmor the GPG key if necessary"
   ansible.builtin.shell:
     cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
     creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
+  when: ansible_facts['os_family'] == "Debian"
   become: true
 
-#- name: "Install Visual Studio Code repo"
-#  ansible.builtin.apt_repository:
-#    repo: >-
-#      deb [arch={{ adrianjuhl__visual_studio_code__visual_studio_code_deb_architecture }}
-#      {{ adrianjuhl__visual_studio_code__visual_studio_code_gpgcheck | ternary("", " trusted=true") }}
-#      signed-by=/usr/share/keyrings/microsoft.gpg]
-#      {{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/repos/code stable main
-#    filename: "vscode"
-#    state: "present"
-#  when: not adrianjuhl__visual_studio_code__visual_studio_code_skip_add_repo
-#  become: true
-
-- name: "Install Visual Studio Code repo"
+- name: "configure Visual Studio Code repo (Debian)"
   ansible.builtin.deb822_repository:
     name: "vscode"
     types: "deb"
@@ -41,10 +31,24 @@
       - "main"
     architectures: amd64
     signed_by: "/usr/share/keyrings/microsoft.gpg"
+  when: ansible_facts['os_family'] == "Debian"
+  become: true
+
+- name: "configure Visual Studio Code repo (RedHat)"
+  ansible.builtin.yum_repository:
+    name: "code"
+    description: "Visual Studio Code"
+    baseurl: "https://packages.microsoft.com/yumrepos/vscode"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "https://packages.microsoft.com/keys/microsoft.asc"
+    mode: "0644"
+  when: ansible_facts['os_family'] == "RedHat"
   become: true
 
 - name: "Install Visual Studio Code"
-  ansible.builtin.apt:
+#  ansible.builtin.apt:
+  ansible.builtin.package:
     name: "{{ adrianjuhl__visual_studio_code__visual_studio_code_package }}{{ (adrianjuhl__visual_studio_code__visual_studio_code_version | length > 0) | ternary('=' + adrianjuhl__visual_studio_code__visual_studio_code_version, '') }}"
     state: "present"
   become: true
