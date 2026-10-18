@@ -5,9 +5,25 @@
 # Is there a need to ensure that the /etc/apt/keyrings directory exists?
 # Should this role be responsible for that?
 
+- name: "Install microsoft signing key"
+  ansible.builtin.get_url:
+    url: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
+    dest: "/usr/share/keyrings/"
+    mode: "u=rw,go=r"
+    force: true
+  when: ansible_facts['os_family'] == "Debian"
+  become: true
+
+- name: "Dearmor the GPG key if necessary"
+  ansible.builtin.shell:
+    cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
+    creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
+  when: ansible_facts['os_family'] == "Debian"
+  become: true
+
 - name: "Add Visual Studio Code DEB822 repository and key"
   ansible.builtin.deb822_repository:
-    name: "code"
+    name: "visual_studio_code"
     architectures:
       - "amd64"
     types:
@@ -18,27 +34,12 @@
       - "stable"
     components:
       - "main"
-    signed_by: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
+#    signed_by: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
+    signed_by: "/usr/share/keyrings/microsoft.gpg"
     state: "present"
   when: ansible_facts['os_family'] == "Debian"
   become: true
 
-#- name: "Install microsoft signing key"
-#  ansible.builtin.get_url:
-#    url: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
-#    dest: "/usr/share/keyrings/"
-#    mode: "u=rw,go=r"
-#    force: true
-#  when: ansible_facts['os_family'] == "Debian"
-#  become: true
-#
-#- name: "Dearmor the GPG key if necessary"
-#  ansible.builtin.shell:
-#    cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
-#    creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
-#  when: ansible_facts['os_family'] == "Debian"
-#  become: true
-#
 #- name: "configure Visual Studio Code repo (Debian)"
 #  ansible.builtin.deb822_repository:
 #    name: "vscode"
