@@ -5,43 +5,61 @@
 # Is there a need to ensure that the /etc/apt/keyrings directory exists?
 # Should this role be responsible for that?
 
-- name: "Install microsoft signing key"
-  ansible.builtin.get_url:
-    url: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
-    dest: "/usr/share/keyrings/"
-    mode: "u=rw,go=r"
-    force: true
-  when: ansible_facts['os_family'] == "Debian"
-  become: true
-
-- name: "Dearmor the GPG key if necessary"
-  ansible.builtin.shell:
-    cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
-    creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
-  when: ansible_facts['os_family'] == "Debian"
-  become: true
-
-- name: "configure Visual Studio Code repo (Debian)"
+- name: "Add Visual Studio Code DEB822 repository and key"
   ansible.builtin.deb822_repository:
-    name: "vscode"
-    types: "deb"
-    uris: "https://packages.microsoft.com/repos/code"
-    suites: "stable"
+    name: "visual_studio_code"
+    architectures:
+      - "amd64"
+    types:
+      - "deb"
+    uris:
+      - "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/repos/code"
+    suites:
+      - "stable"
     components:
       - "main"
-    architectures: amd64
-    signed_by: "/usr/share/keyrings/microsoft.gpg"
+    signed_by: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
+    state: "present"
   when: ansible_facts['os_family'] == "Debian"
   become: true
+
+#- name: "Install microsoft signing key"
+#  ansible.builtin.get_url:
+#    url: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
+#    dest: "/usr/share/keyrings/"
+#    mode: "u=rw,go=r"
+#    force: true
+#  when: ansible_facts['os_family'] == "Debian"
+#  become: true
+#
+#- name: "Dearmor the GPG key if necessary"
+#  ansible.builtin.shell:
+#    cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
+#    creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
+#  when: ansible_facts['os_family'] == "Debian"
+#  become: true
+#
+#- name: "configure Visual Studio Code repo (Debian)"
+#  ansible.builtin.deb822_repository:
+#    name: "vscode"
+#    types: "deb"
+#    uris: "https://packages.microsoft.com/repos/code"
+#    suites: "stable"
+#    components:
+#      - "main"
+#    architectures: amd64
+#    signed_by: "/usr/share/keyrings/microsoft.gpg"
+#  when: ansible_facts['os_family'] == "Debian"
+#  become: true
 
 - name: "configure Visual Studio Code repo (RedHat)"
   ansible.builtin.yum_repository:
-    name: "code"
+    name: "visual_studio_code"
     description: "Visual Studio Code"
-    baseurl: "https://packages.microsoft.com/yumrepos/vscode"
+    baseurl: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/yumrepos/vscode"
     enabled: true
     gpgcheck: true
-    gpgkey: "https://packages.microsoft.com/keys/microsoft.asc"
+    gpgkey: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
     mode: "0644"
   when: ansible_facts['os_family'] == "RedHat"
   become: true
