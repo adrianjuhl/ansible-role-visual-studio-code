@@ -7,7 +7,7 @@
 
 - name: "Add Visual Studio Code DEB822 repository and key"
   ansible.builtin.deb822_repository:
-    name: "visual_studio_code"
+    name: "code"
     architectures:
       - "amd64"
     types:
