@@ -14,12 +14,12 @@
   when: ansible_facts['os_family'] == "Debian"
   become: true
 
-- name: "Dearmor the GPG key if necessary"
-  ansible.builtin.shell:
-    cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
-    creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
-  when: ansible_facts['os_family'] == "Debian"
-  become: true
+#- name: "Dearmor the GPG key if necessary"
+#  ansible.builtin.shell:
+#    cmd: "gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /usr/share/keyrings/microsoft.asc"
+#    creates: "/usr/share/keyrings/microsoft.gpg" # Makes the task idempotent
+#  when: ansible_facts['os_family'] == "Debian"
+#  become: true
 
 - name: "Add Visual Studio Code DEB822 repository and key"
   ansible.builtin.deb822_repository:
@@ -35,7 +35,8 @@
     components:
       - "main"
 #    signed_by: "{{ adrianjuhl__visual_studio_code__visual_studio_code_mirror }}/keys/microsoft.asc"
-    signed_by: "/usr/share/keyrings/microsoft.gpg"
+#    signed_by: "/usr/share/keyrings/microsoft.gpg"
+    signed_by: "/usr/share/keyrings/microsoft.asc"
     state: "present"
   when: ansible_facts['os_family'] == "Debian"
   become: true
